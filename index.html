@@ -3,121 +3,119 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>스마트 웹 번역기</title>
+    <title>나만의 스마트 번역기</title>
     <style>
-        body { font-family: 'Malgun Gothic', sans-serif; background-color: #f0f2f5; display: flex; justify-content: center; align-items: center; min-height: 100vh; margin: 0; }
-        .container { width: 100%; max-width: 600px; background: white; padding: 30px; border-radius: 20px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); }
-        h2 { text-align: center; color: #002451; margin-bottom: 25px; }
+        :root { --main-blue: #002451; --bg-gray: #f4f7f9; }
+        body { font-family: 'Malgun Gothic', sans-serif; background-color: var(--bg-gray); display: flex; justify-content: center; align-items: center; min-height: 100vh; margin: 0; padding: 20px; box-sizing: border-box; }
+        .container { width: 100%; max-width: 550px; background: white; padding: 25px; border-radius: 15px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); }
+        h2 { text-align: center; color: var(--main-blue); margin-top: 0; }
         
-        .section-label { font-size: 13px; color: #666; margin-bottom: 8px; font-weight: bold; }
-        textarea { width: 100%; height: 150px; padding: 15px; border: 1px solid #ddd; border-radius: 10px; resize: none; font-size: 15px; box-sizing: border-box; transition: border 0.3s; }
-        textarea:focus { border-color: #002451; outline: none; }
-
-        .controls { display: flex; justify-content: space-between; align-items: center; margin: 20px 0; gap: 10px; }
-        select { flex: 1; padding: 10px; border-radius: 8px; border: 1px solid #ddd; cursor: pointer; }
+        .label { font-size: 13px; font-weight: bold; color: #555; margin: 15px 0 5px 0; }
+        textarea { width: 100%; height: 140px; padding: 15px; border: 1px solid #ddd; border-radius: 10px; resize: none; font-size: 16px; box-sizing: border-box; }
         
-        /* 치환 버튼 스타일 */
-        .swap-btn { background-color: #f8f9fa; border: 1px solid #ccc; padding: 10px 15px; border-radius: 8px; cursor: pointer; font-weight: bold; transition: background 0.2s; }
-        .swap-btn:hover { background-color: #e2e6ea; }
+        .btn-row { display: flex; justify-content: space-between; align-items: center; margin: 15px 0; gap: 10px; }
+        .swap-btn { background: #fff; border: 1px solid #ccc; padding: 8px 12px; border-radius: 5px; cursor: pointer; font-size: 14px; white-space: nowrap; }
+        .swap-btn:hover { background: #eee; }
+        
+        select { flex: 1; padding: 10px; border-radius: 5px; border: 1px solid #ccc; font-size: 14px; }
+        
+        .translate-btn { width: 100%; padding: 15px; background: var(--main-blue); color: white; border: none; border-radius: 10px; font-size: 17px; font-weight: bold; cursor: pointer; }
+        .translate-btn:active { transform: scale(0.98); }
 
-        .translate-btn { width: 100%; padding: 15px; background-color: #002451; color: white; border: none; border-radius: 10px; font-size: 16px; font-weight: bold; cursor: pointer; transition: background 0.3s; }
-        .translate-btn:hover { background-color: #001a3d; }
-
-        #resultArea { width: 100%; min-height: 150px; margin-top: 10px; padding: 15px; background-color: #f9f9f9; border: 1px solid #ddd; border-radius: 10px; font-size: 15px; box-sizing: border-box; white-space: pre-wrap; word-break: break-all; }
-        .status { font-size: 12px; color: #007bff; margin-top: 5px; text-align: right; height: 18px; }
+        #result { width: 100%; min-height: 140px; background: #f9f9f9; border: 1px solid #ddd; border-radius: 10px; padding: 15px; box-sizing: border-box; font-size: 16px; white-space: pre-wrap; word-break: break-all; margin-top: 5px; }
+        .footer-info { font-size: 12px; color: #888; text-align: right; margin-top: 5px; }
     </style>
 </head>
 <body>
 
 <div class="container">
-    <h2>🌐 DeepL 스마트 번역기</h2>
+    <h2>🌐 Smart Translator</h2>
     
-    <div class="section-label">번역할 내용 (자동 언어 감지)</div>
-    <textarea id="inputText" placeholder="여기에 내용을 입력하세요..."></textarea>
+    <div class="label">입력 (언어 자동 감지)</div>
+    <textarea id="inputText" placeholder="번역할 내용을 입력하세요..."></textarea>
     
-    <div class="status" id="detectedLang"></div>
-
-    <div class="controls">
-        <button class="swap-btn" onclick="swapContent()" title="위아래 내용 바꾸기">⇅ 내용 치환</button>
+    <div class="btn-row">
+        <button class="swap-btn" onclick="handleSwap()">⇅ 내용 치환</button>
         <select id="targetLang">
             <option value="KO">한국어로 번역</option>
             <option value="EN">영어로 번역</option>
             <option value="JA">일본어로 번역</option>
             <option value="ZH">중국어로 번역</option>
-            <option value="DE">독일어로 번역</option>
             <option value="FR">프랑스어로 번역</option>
+            <option value="DE">독일어로 번역</option>
         </select>
     </div>
 
-    <button class="translate-btn" onclick="translateText()">번역 실행</button>
+    <button class="translate-btn" onclick="startTranslation()">번역 실행</button>
 
-    <div class="section-label" style="margin-top: 25px;">번역 결과</div>
-    <div id="resultArea">결과가 여기에 표시됩니다.</div>
+    <div class="label">번역 결과</div>
+    <div id="result">결과가 여기에 표시됩니다.</div>
+    <div class="footer-info" id="langStatus"></div>
 </div>
 
 <script>
-    // --- [주의] 여기에 본인의 API 키를 입력하세요 ---
-    const API_KEY = "a703cc7a-b212-4099-89f3-15938922f568:fx"; 
-    // -------------------------------------------
+    // --- [중요] 여기에 본인의 API 키를 입력하세요 ---
+    const MY_DEEPL_KEY = "a703cc7a-b212-4099-89f3-15938922f568:fx"; 
+    // --------------------------------------------
 
-    // 1. 치환 기능: 입력창과 결과창의 텍스트를 서로 바꿉니다.
-    function swapContent() {
-        const inputArea = document.getElementById('inputText');
-        const resultArea = document.getElementById('resultArea');
+    // 1. 치환 기능 (위아래 내용 바꾸기)
+    function handleSwap() {
+        const inputField = document.getElementById('inputText');
+        const resultField = document.getElementById('result');
         
-        const tempText = inputArea.value;
-        const currentResult = resultArea.innerText;
-
-        // 결과창이 초기 상태가 아닐 때만 치환
-        if (currentResult !== "결과가 여기에 표시됩니다." && currentResult !== "번역 중...") {
-            inputArea.value = currentResult;
-            resultArea.innerText = tempText;
-        } else if (inputArea.value !== "") {
-            // 입력창에만 글이 있을 경우 결과창으로 보내기
-            resultArea.innerText = inputArea.value;
-            inputArea.value = "";
+        const temp = inputField.value;
+        // 결과창이 비어있지 않을 때만 치환
+        if (resultField.innerText && resultField.innerText !== "결과가 여기에 표시됩니다." && resultField.innerText !== "번역 중...") {
+            inputField.value = resultField.innerText;
+            resultField.innerText = temp;
         }
     }
 
-    // 2. 번역 기능: DeepL API를 호출합니다.
-    async function translateText() {
+    // 2. 번역 실행 기능 (CORS 대응 방식)
+    async function startTranslation() {
         const text = document.getElementById('inputText').value;
-        const targetLang = document.getElementById('targetLang').value;
-        const resultArea = document.getElementById('resultArea');
-        const detectedLabel = document.getElementById('detectedLang');
+        const target = document.getElementById('targetLang').value;
+        const resultDisplay = document.getElementById('result');
+        const statusDisplay = document.getElementById('langStatus');
 
         if (!text.trim()) {
-            alert("번역할 내용을 입력해주세요.");
+            alert("내용을 입력해주세요.");
             return;
         }
 
-        resultArea.innerText = "번역 중...";
-        detectedLabel.innerText = "";
+        resultDisplay.innerText = "번역 중...";
+        statusDisplay.innerText = "";
 
         try {
-            const response = await fetch(`https://api-free.deepl.com/v2/translate`, {
-                method: 'POST',
+            // 브라우저 차단을 피하기 위해 auth_key를 body에 포함하여 전송
+            const response = await fetch("https://api-free.deepl.com/v2/translate", {
+                method: "POST",
                 headers: {
-                    'Authorization': `DeepL-Auth-Key ${API_KEY}`,
-                    'Content-Type': 'application/x-www-form-urlencoded'
+                    "Content-Type": "application/x-www-form-urlencoded",
                 },
                 body: new URLSearchParams({
-                    'text': text,
-                    'target_lang': targetLang
+                    "auth_key": MY_DEEPL_KEY,
+                    "text": text,
+                    "target_lang": target
                 })
             });
 
-            const data = await response.json();
-
-            if (data.translations && data.translations.length > 0) {
-                resultArea.innerText = data.translations[0].text;
-                detectedLabel.innerText = `감지된 언어: ${data.translations[0].detected_source_language}`;
-            } else {
-                resultArea.innerText = "번역 실패: API 응답을 확인하세요.";
+            if (!response.ok) {
+                const errorData = await response.json();
+                throw new Error(errorData.message || "서버 응답 오류");
             }
+
+            const data = await response.json();
+            
+            if (data.translations && data.translations.length > 0) {
+                resultDisplay.innerText = data.translations[0].text;
+                statusDisplay.innerText = "감지된 언어: " + data.translations[0].detected_source_language;
+            }
+
         } catch (error) {
-            resultArea.innerText = "오류 발생: " + error.message;
             console.error(error);
+            resultDisplay.innerText = "오류 발생: " + error.message;
+            alert("에러가 발생했습니다. API 키를 다시 확인하거나 잠시 후 시도하세요.");
         }
     }
 </script>
